@@ -38,6 +38,7 @@ function change_order_status_based_on_shipping_method( $order_id, $data ) {
               }
             if( $shipping_method  == 'MCO Delivery (Arrives 2PM-7PM Same-Day If Ordered Before 2PM)' ) { 
                   $order->update_status( 'delivery-unfulfil' );
+                 // do_action( 'woocommerce_order_status_changed', $order_id, $old_status, $new_status , $order);
               }
 
     }
