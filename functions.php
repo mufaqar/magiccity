@@ -73,16 +73,6 @@ function custom_function_on_order_status_change( $order_id, $old_status, $new_st
 
 
 
-  
-  
-   
-  
-  
-
-
-
-
-
 // function update_custom_order_fields1( $order_id ) {
 
 
@@ -139,36 +129,33 @@ function custom_function_on_order_status_change( $order_id, $old_status, $new_st
 
 
 function update_order_status_from_admin( $order_id ) {
-
-
-
-    // Get the order object
   $order = wc_get_order( $order_id );
-
- 
-   
-
-     $driver_data =  get_post_meta($order_id, 'lddfw_driverid', true); 
+  $driver_data =  get_post_meta($order_id, 'lddfw_driverid', true); 
   
-    if($driver_data != '')
-    {
- 
+      $driver_data =  get_post_meta($order_id, 'lddfw_driverid', true); 
 
-    wp_update_post( array(
-      'ID' => $order_id,
-      'post_status' => 'driver-assigned',
-    ) );
-   
-  
-    }
+      if($driver_data != '')
+      {
+      // Get the order object
+      $order = wc_get_order( $order_id );
 
+      // Get the current order status
+      $old_status = $order->get_status();
 
+      $order = wc_get_order( $order_id );
 
-  
- do_action( 'woocommerce_order_status_changed', $order_id, 'ready-delivery', 'driver-assigned' );
- die();
+      // Update the order status
+      $order->update_status( 'driver-assigned' );
+
+      // Get the new order status
+      $new_status = $order->get_status();
+
+      // Trigger the woocommerce_order_status_changed action
+      do_action( 'woocommerce_order_status_changed', $order_id, $old_status, $new_status );
+      }
+
 }
-//add_action( 'woocommerce_process_shop_order_meta', 'update_order_status_from_admin', 10, 1 );
+add_action( 'woocommerce_process_shop_order_meta', 'update_order_status_from_admin', 10, 1 );
 
 
 
