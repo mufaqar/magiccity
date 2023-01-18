@@ -64,30 +64,17 @@ function order_status_change_pickup_to_compelted( $order_id, $old_status, $new_s
 
 }
 
-
-
 // updated order if status is ready for deliver and driver assigned
 function update_order_status_from_admin( $order_id ) {
   $order = wc_get_order( $order_id ); 
   $driver_data =  get_post_meta($order_id, 'lddfw_driverid', true); 
-
       if($driver_data != '')
       {
-      // Get the order object
       $order = wc_get_order( $order_id );
-
-      // Get the current order status
       $old_status = $order->get_status();
-
       $order = wc_get_order( $order_id );
-
-      // Update the order status
       $order->update_status( 'driver-assigned' );
-
-      // Get the new order status
       $new_status = $order->get_status();
-
-      // Trigger the woocommerce_order_status_changed action
       do_action( 'woocommerce_order_status_changed', $order_id, $old_status, $new_status , $order );
       }
 
