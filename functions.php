@@ -61,11 +61,11 @@ function custom_function_on_order_status_change( $order_id, $old_status, $new_st
        $driver_data =  get_post_meta($order_id, 'lddfw_driverid', true); 
 
           if($driver_data != '')
-    {
+          {
 
-        $order->update_status( 'wc-driver-assigned' );
-        do_action( 'woocommerce_order_status_changed', $order_id, $old_status, $new_status , $order);
-    }
+              $order->update_status( 'wc-driver-assigned' );
+              do_action( 'woocommerce_order_status_changed', $order_id, $old_status, $new_status , $order);
+          }
 
     }
 
