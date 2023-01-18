@@ -73,66 +73,10 @@ function custom_function_on_order_status_change( $order_id, $old_status, $new_st
 
 
 
-// function update_custom_order_fields1( $order_id ) {
-
-
-//   $driver_data =  get_post_meta($order_id, 'lddfw_driverid', true); 
-
-//   if($driver_data != '')
-//   {
-//   // Get the order object
-//   $order = wc_get_order( $order_id );
-
-//   // Get the current order status
-//   $old_status = $order->get_status();
-
-//   $order = wc_get_order( $order_id );
-
-//   // Update the order status
-//   $order->update_status( 'driver-assigned' );
-
-//   // Get the new order status
-//   $new_status = $order->get_status();
-
-//   // Trigger the woocommerce_order_status_changed action
-//   do_action( 'woocommerce_order_status_changed', $order_id, $old_status, $new_status );
-//   }
-// }
-//add_action( 'woocommerce_checkout_update_order_meta', 'update_custom_order_fields' );
-
-
-// function update_custom_order_fields( $order_id ) {
-//   // Get the posted custom fields
-//   $custom_field_1 = $_POST['custom_field_1'];
-//   $custom_field_2 = $_POST['custom_field_2'];
-
-//   // Update the order meta with the custom fields
-//   update_post_meta( $order_id, '_custom_field_1', $custom_field_1 );
-//   update_post_meta( $order_id, '_custom_field_2', $custom_field_2 );
-
-//   // Get the order object
-//   $order = wc_get_order( $order_id );
-
-//   // Get the current order status
-//   $old_status = $order->get_status();
-
-//   // Update the order status
-//   $order->update_status( 'processing' );
-
-//   // Get the new order status
-//   $new_status = $order->get_status();
-
-//   // Trigger the woocommerce_order_status_changed action
-//   do_action( 'woocommerce_order_status_changed', $order_id, $old_status, $new_status );
-// }
-// //add_action( 'woocommerce_checkout_update_order_meta', 'update_custom_order_fields' );
-
-
+// updated order if status is ready for deliver and driver assigned
 function update_order_status_from_admin( $order_id ) {
-  $order = wc_get_order( $order_id );
+  $order = wc_get_order( $order_id ); 
   $driver_data =  get_post_meta($order_id, 'lddfw_driverid', true); 
-  
-      $driver_data =  get_post_meta($order_id, 'lddfw_driverid', true); 
 
       if($driver_data != '')
       {
@@ -151,7 +95,7 @@ function update_order_status_from_admin( $order_id ) {
       $new_status = $order->get_status();
 
       // Trigger the woocommerce_order_status_changed action
-      do_action( 'woocommerce_order_status_changed', $order_id, $old_status, $new_status );
+      do_action( 'woocommerce_order_status_changed', $order_id, $old_status, $new_status , $order );
       }
 
 }
