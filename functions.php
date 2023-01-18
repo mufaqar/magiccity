@@ -31,17 +31,16 @@ if ( ! function_exists( 'cliff_remove_divi_project_post_type' ) ) {
 
 add_action( 'woocommerce_checkout_update_order_meta', 'change_order_status_based_on_shipping_method', 10, 2 );
 function change_order_status_based_on_shipping_method( $order_id, $data ) {
-  $order = wc_get_order( $order_id );
-  $shipping_method = $order->get_shipping_method();
-  
-  if( $shipping_method  == 'Free Store Pickup (M-F 10AM-4:30PM | Sat 11AM-4:30PM | Closed Sunday)' ) { 
-    $order->update_status( 'custom-status' );
-}
-if( $shipping_method  == 'MCO Delivery (Arrives 2PM-7PM Same-Day If Ordered Before 2PM)' ) { 
-    $order->update_status( 'delivery-unfulfil' );
-}
+            $order = wc_get_order( $order_id );
+            $shipping_method = $order->get_shipping_method();  
+            if( $shipping_method  == 'Free Store Pickup (M-F 10AM-4:30PM | Sat 11AM-4:30PM | Closed Sunday)' ) { 
+                  $order->update_status( 'custom-status' );
+              }
+            if( $shipping_method  == 'MCO Delivery (Arrives 2PM-7PM Same-Day If Ordered Before 2PM)' ) { 
+                  $order->update_status( 'delivery-unfulfil' );
+              }
 
-}
+    }
 
 // Pickup Order Status Change
 
