@@ -45,11 +45,8 @@ if( $shipping_method  == 'MCO Delivery (Arrives 2PM-7PM Same-Day If Ordered Befo
 
 // Pickup Order Status Change
 
-add_action( 'woocommerce_order_status_changed', 'custom_function_on_order_status_change', 9, 3 );
-
-function custom_function_on_order_status_change( $order_id, $old_status, $new_status ) {
-
-
+add_action( 'woocommerce_order_status_changed', 'order_status_change_pickup_to_complted', 9, 3 );
+function order_status_change_pickup_to_complted( $order_id, $old_status, $new_status ) {
     $order = wc_get_order( $order_id );
     $old_status = $order->get_status();
     if($old_status == 'pickup'){
