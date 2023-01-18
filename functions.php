@@ -44,8 +44,8 @@ function change_order_status_based_on_shipping_method( $order_id, $data ) {
 
 // Pickup Order Status Change
 
-add_action( 'woocommerce_order_status_changed', 'order_status_change_pickup_to_complted', 9, 3 );
-function order_status_change_pickup_to_complted( $order_id, $old_status, $new_status ) {
+add_action( 'woocommerce_order_status_changed', 'order_status_change_pickup_to_compelted', 9, 3 );
+function order_status_change_pickup_to_compelted( $order_id, $old_status, $new_status ) {
     $order = wc_get_order( $order_id );
     $old_status = $order->get_status();
     if($old_status == 'pickup'){
