@@ -70,10 +70,10 @@ function update_order_status_from_admin( $order_id ) {
   $driver_data =  get_post_meta($order_id, 'lddfw_driverid', true); 
       if($driver_data != '')
       {
-      $order = wc_get_order( $order_id );
+    
       $old_status = $order->get_status();
       $order = wc_get_order( $order_id );
-      $order->update_status( 'driver-assigned' );
+      $order->update_status( 'wc-driver-assigned' );
       $new_status = $order->get_status();
       do_action( 'woocommerce_order_status_changed', $order_id, $old_status, $new_status , $order );
       }
