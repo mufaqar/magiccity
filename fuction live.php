@@ -1,4 +1,5 @@
 <?php
+
 function my_theme_enqueue_styles() { 
     wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css' );
 }
@@ -29,67 +30,43 @@ if ( ! function_exists( 'cliff_remove_divi_project_post_type' ) ) {
 
 // Shipping Mehtod Based Order Status
 
-add_action( 'woocommerce_checkout_update_order_meta', 'change_order_status_based_on_shipping_method', 10, 2 );
+//add_action( 'woocommerce_checkout_update_order_meta', 'change_order_status_based_on_shipping_method', 10, 2 );
 function change_order_status_based_on_shipping_method( $order_id, $data ) {
-            $order = wc_get_order( $order_id );
-            $shipping_method = $order->get_shipping_method();  
-            if( $shipping_method  == 'Free Store Pickup (M-F 10AM-4:30PM | Sat 11AM-4:30PM | Closed Sunday)' ) { 
-                  $order->update_status( 'custom-status' );
-              }
-            if( $shipping_method  == 'MCO Delivery (Arrives 2PM-7PM Same-Day If Ordered Before 2PM)' ) { 
-                  $order->update_status( 'delivery-unfulfil' );
-                 // do_action( 'woocommerce_order_status_changed', $order_id, $old_status, $new_status , $order);
-              }
+  $order = wc_get_order( $order_id );
+  $shipping_method = $order->get_shipping_method();
+  
+  if( $shipping_method  == 'Free Store Pickup (M-F 10AM-4:30PM | Sat 11AM-4:30PM | Closed Sunday)' ) { 
+    $order->update_status( 'wc-custom-status' );
+}
+if( $shipping_method  == 'MCO Delivery (Arrives 2PM-7PM Same-Day If Ordered Before 2PM)' ) { 
+    $order->update_status( 'wc-delivery-unfulfil' );
+}
 
-    }
+}
 
 // Pickup Order Status Change
 
-add_action( 'woocommerce_order_status_changed', 'order_status_change_pickup_to_compelted', 9, 3 );
-function order_status_change_pickup_to_compelted( $order_id, $old_status, $new_status ) {
-    $order = wc_get_order( $order_id );
-    $old_status = $order->get_status();
-    if($old_status == 'pickup'){
-        $order->update_status( 'wc-completed' );
-        do_action( 'woocommerce_order_status_changed', $order_id, $old_status, $new_status , $order);
-        send_order_completed_email($order_id);
-    }
-    elseif ($old_status == 'ready-delivery') {
-       $driver_data =  get_post_meta($order_id, 'lddfw_driverid', true); 
-          if($driver_data != '')
-          {
-              $order->update_status( 'wc-driver-assigned' );
-              do_action( 'woocommerce_order_status_changed', $order_id, $old_status, $new_status , $order);
-          }
+function custom_function_on_order_status_change( $order_id, $old_status, $new_status ) {
+  if (  $new_status == 'wc-pickup' ) {
+    wp_update_post( array(
+      'ID' => $order_id,
+      'post_status' => 'wc-completed',
+    ) );
+  }
 
-    }
+  elseif (  $old_status == 'wc-pickup' ) {
+    wp_update_post( array(
+      'ID' => $order_id,
+      'post_status' => 'wc-completed',
+    ) );
+  }
+
 
 }
-
-// updated order if status is ready for deliver and driver assigned
-function update_order_status_from_admin( $order_id ) {
-  $order = wc_get_order( $order_id ); 
-  $driver_data =  get_post_meta($order_id, 'lddfw_driverid', true); 
-      if($driver_data != '')
-      {    
-      $old_status = $order->get_status();  
-      $order->update_status( 'wc-driver-assigned' );
-      $new_status = $order->get_status();
-      do_action( 'woocommerce_order_status_changed', $order_id, $old_status, $new_status , $order );
-      }
-
-}
-add_action( 'woocommerce_process_shop_order_meta', 'update_order_status_from_admin', 10, 1 );
+add_action( 'woocommerce_order_status_changed', 'custom_function_on_order_status_change', 10, 3 );
 
 
 
-function send_order_completed_email( $order_id ) {
-  $order = wc_get_order( $order_id );
-  $to = $order->get_billing_email();
-  $subject = 'Order Completed';
-  $message = 'Your order has been completed. Thank you for your purchase!';
-  wp_mail( $to, $subject, $message );
-}
 
 
 
@@ -153,37 +130,7 @@ function register_unfulfilled_custom_order_status( $order_statuses ){
    'show_in_admin_all_list'    => true,                                 
    'show_in_admin_status_list' => true,                                 
    'label_count'               => _n_noop( 'Driver Assigned <span class="count">(%s)</span>', 'Driver Assigned <span class="count">(%s)</span>', 'woocommerce' ),         
-   ); 
-   
-   $order_statuses['wc-pickup'] = array(                                 
-    'label'                     => 'Pickup',
-    'public'                    => false,                                 
-    'exclude_from_search'       => false,                                 
-    'show_in_admin_all_list'    => true,                                 
-    'show_in_admin_status_list' => true,                                 
-    'label_count'               => _n_noop( 'Pickup <span class="count">(%s)</span>', 'Pickup <span class="count">(%s)</span>', 'woocommerce' ),         
-    ); 
-
-    $order_statuses['wc-pickup'] = array(                                 
-      'label'                     => 'Picked Up',
-      'public'                    => false,                                 
-      'exclude_from_search'       => false,                                 
-      'show_in_admin_all_list'    => true,                                 
-      'show_in_admin_status_list' => true,                                 
-      'label_count'               => _n_noop( 'Picked Up <span class="count">(%s)</span>', 'Picked Up <span class="count">(%s)</span>', 'woocommerce' ),         
-      ); 
-
-      $order_statuses['wc-ready-pickup'] = array(                                 
-        'label'                     => 'Ready for Pickup',
-        'public'                    => false,                                 
-        'exclude_from_search'       => false,                                 
-        'show_in_admin_all_list'    => true,                                 
-        'show_in_admin_status_list' => true,                                 
-        'label_count'               => _n_noop( 'Ready for Pickup <span class="count">(%s)</span>', 'Ready for Pickup <span class="count">(%s)</span>', 'woocommerce' ),         
-        ); 
-     
-  
-    
+   );   
    
    return $order_statuses;
 }
@@ -191,21 +138,18 @@ function register_unfulfilled_custom_order_status( $order_statuses ){
 
 
  
-
+// // ---------------------
 // // 2. Show Order Status in the Dropdown @ Single Order and "Bulk Actions" @ Orders
  
 add_filter( 'wc_order_statuses', 'show_unfulfilled_custom_order_status' );
  
 function show_unfulfilled_custom_order_status( $order_statuses ) {      
-  $order_statuses['wc-custom-status'] = 'Pickup Unfulfilled';
+    $order_statuses['wc-custom-status'] = 'Pickup Unfulfilled';
 	$order_statuses['wc-shipping-unfulfil'] = 'Shipping Unfulfilled';
 	$order_statuses['wc-delivery-unfulfil'] = 'Delivery Unfulfilled';
 	$order_statuses['wc-ready-delivery'] = 'Ready for Delivery';
 	$order_statuses['wc-ready-ship'] = 'Ready to Ship'; 
 	$order_statuses['wc-driver-assigned'] = 'Driver Assigned';
-  $order_statuses['wc-ready-pickup'] = 'Ready for Pickup';
-  $order_statuses['wc-pickup'] = 'Picked Up';
-
     return $order_statuses;
 }
  
@@ -213,15 +157,12 @@ add_filter( 'bulk_actions-edit-shop_order', 'get_unfulfilled_custom_order_status
  
 function get_unfulfilled_custom_order_status_bulk( $bulk_actions ) {
    // Note: "mark_" must be there instead of "wc"
-   
-  $bulk_actions['mark_custom-status'] = 'Change status to pickup unfulfilled';
-	$bulk_actions['mark_shipping-unfulfil'] = 'Change status to shipping unfulfilled ';
+    $bulk_actions['mark_custom-status'] = 'Change status to pickup unfulfilled';
+	$bulk_actions['mark_shipping-unfulfil'] = 'Change status to shipping unfulfilled';
 	$bulk_actions['mark_delivery-unfulfil'] = 'Change status to delivery unfulfilled';
 	$bulk_actions['mark_ready-delivery'] = 'Change status to ready for delivery';
 	$bulk_actions['mark_ready-ship'] = 'Change status to ready to ship';
 	$bulk_actions['mark_driver-assigned'] = 'Change status to driver assigned';
-  $bulk_actions['mark_ready-pickup'] = 'Change status to Ready for Pickup';
-  $bulk_actions['mark_pickup'] = 'Change status to Picked Up';
 
     return $bulk_actions;
 }
@@ -236,7 +177,7 @@ function get_unfulfilled_custom_order_status_bulk( $bulk_actions ) {
 
 // // 3. Set Custom Order Status @ WooCommerce Checkout Process
  
-//add_action( 'woocommerce_payment_complete', 'thankyou_change_unfulfilled_order_status' );
+add_action( 'woocommerce_payment_complete', 'thankyou_change_unfulfilled_order_status' );
  
 function thankyou_change_unfulfilled_order_status( $order_id ){
    if( ! $order_id ) return;
@@ -278,7 +219,7 @@ function styling_admin_order_list() {
     $order_status = 'delivery-unfulfil'; // <==== HERE
 	$shipping_unfulfil = 'shipping-unfulfil';
 	$custom_status = 'custom-status'; // pickup unfulfilled
-//	$completed = 'completed';
+	$completed = 'completed';
 }
 //  echo "<style>
 //         .order-status.status-".sanitize_title( $order_status )." {
@@ -422,7 +363,7 @@ function hid_e_plug() {
         display: none;
 	}
 
-   
+    #bulk-action-selector-top option[value=mark_order-complete] {display: none;}
     
   </style>';
 }
@@ -462,3 +403,14 @@ function disable_shipping_calc_on_cart( $show_shipping ) {
     return $show_shipping;
 }
 add_filter( 'woocommerce_cart_ready_to_calc_shipping', 'disable_shipping_calc_on_cart', 99 );
+function change_order_status_on_pickup( $order_id ) {
+    // Get the order object
+    $order = wc_get_order( $order_id );
+ 
+    // Check if the order has the "Picked Up" status
+    if ( 'wc-picked-up' === $order->get_status() ) {
+        // Update the order status to "Completed"
+        $order->update_status( 'completed' );
+    }
+}
+add_action( 'woocommerce_order_status_changed', 'change_order_status_on_pickup', 10, 1 );
