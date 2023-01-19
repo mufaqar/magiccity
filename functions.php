@@ -52,7 +52,7 @@ function order_status_change_pickup_to_compelted( $order_id, $old_status, $new_s
     if($old_status == 'pickup'){
         $order->update_status( 'wc-completed' );
         do_action( 'woocommerce_order_status_changed', $order_id, $old_status, $new_status , $order);
-        send_order_completed_email($order_id);
+        email_notification_to_customer($order_id);
     }
     elseif ($old_status == 'ready-delivery') {
        $driver_data =  get_post_meta($order_id, 'lddfw_driverid', true); 
@@ -83,11 +83,11 @@ add_action( 'woocommerce_process_shop_order_meta', 'update_order_status_from_adm
 
 
 
-function send_order_completed_email( $order_id ) {
+function email_notification_to_customer( $order_id ) {
   $order = wc_get_order( $order_id );
   $to = $order->get_billing_email();
-  $subject = 'Order Completed';
-  $message = 'Your order has been completed. Thank you for your purchase!';
+  $subject = 'Order is Ready to Pick Up ';
+  $message = 'Your order is ready to Pick Up. Thank you for your purchase!';
   wp_mail( $to, $subject, $message );
 }
 
