@@ -52,6 +52,7 @@ function order_status_change_pickup_to_compelted( $order_id, $old_status, $new_s
     if($old_status == 'pickup'){
         $order->update_status( 'wc-completed' );
         do_action( 'woocommerce_order_status_changed', $order_id, $old_status, $new_status , $order);
+        bbloomer_status_custom_notification($order_id , $order) ;
         email_notification_to_customer($order_id);
     }
     elseif ($old_status == 'ready-delivery') {
@@ -89,9 +90,54 @@ function email_notification_to_customer( $order_id ) {
   $subject = 'Order is Ready to Pick Up ';
   $message = 'Your order is ready to Pick Up. Thank you for your purchase!';
   wp_mail( $to, $subject, $message );
+
+
+
+  $heading = 'Order is Ready to Pick Up ';
+    $subject = 'Your order is ready to Pick Up. Thank you for your purchase!';
+
+
+     // Get an instance of the WC_Email_New_Order object
+     $email = WC()->mailer->get_emails()['WC_Email_New_Order'];
+    
+     
+     
+     
+     // Replace "{product_name}" by the product name
+     $subject = 'Test meail';
+ 
+     // format and return the custom formatted subject
+     return $email->format_string( $subject );
+  
+ 
 }
 
 
+
+//add_action( 'woocommerce_order_status_refused', 'bbloomer_status_custom_notification', 20, 2 );
+  
+function bbloomer_status_custom_notification( $order_id, $order ) {
+      
+    $heading = 'Order is Ready to Pick Up ';
+    $subject = 'Your order is ready to Pick Up. Thank you for your purchase!';
+  
+    // Get WooCommerce email objects
+    $mailer = WC()->mailer()->get_emails();
+  
+    // Use one of the active emails e.g. "Customer_Completed_Order"
+    // Wont work if you choose an object that is not active
+    // Assign heading & subject to chosen object
+    $mailer['WC_Email_Customer_Completed_Order']->heading = $heading;
+    $mailer['WC_Email_Customer_Completed_Order']->settings['heading'] = $heading;
+    $mailer['WC_Email_Customer_Completed_Order']->subject = $subject;
+    $mailer['WC_Email_Customer_Completed_Order']->settings['subject'] = $subject;  
+    // Send the email with custom heading & subject
+    $mailer['WC_Email_Customer_Completed_Order']->trigger( $order_id );
+  
+    // To add email content use https://businessbloomer.com/woocommerce-add-extra-content-order-email/
+    // You have to use the email ID chosen above and also that $order->get_status() == "refused"
+      
+}
 
 /* Display Add to cart button on archives */ 
 
