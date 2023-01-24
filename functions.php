@@ -52,8 +52,8 @@ function order_status_change_pickup_to_compelted( $order_id, $old_status, $new_s
     if($old_status == 'pickup'){
         $order->update_status( 'wc-completed' );
         do_action( 'woocommerce_order_status_changed', $order_id, $old_status, $new_status , $order);
-        bbloomer_status_custom_notification($order_id , $order) ;
-        email_notification_to_customer($order_id);
+        //bbloomer_status_custom_notification($order_id , $order) ;
+        my_awesome_publication_notification($order_id);
     }
     elseif ($old_status == 'ready-delivery') {
        $driver_data =  get_post_meta($order_id, 'lddfw_driverid', true); 
@@ -111,6 +111,29 @@ function email_notification_to_customer( $order_id ) {
   
  
 }
+
+
+
+add_action("woocommerce_order_status_changed", "my_awesome_publication_notification");
+
+function my_awesome_publication_notification($order_id, $checkout=null) {
+   global $woocommerce;
+   $order = new WC_Order( $order_id );
+   if($order->status === 'pickup' ) {
+      // Create a mailer
+      $mailer = $woocommerce->mailer();
+
+      $message_body = __( 'Hello world!!!' );
+
+      $message = $mailer->wrap_message(
+        // Message head and message body.
+        sprintf( __( 'Order %s received' ), $order->get_order_number() ), $message_body );
+      // Cliente email, email subject and message.
+       $mailer->send( $order->billing_email, sprintf( __( 'Order %s received' ), $order->get_order_number() ), $message );
+     }
+
+   }
+
 
 
 
