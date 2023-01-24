@@ -123,13 +123,13 @@ function my_awesome_publication_notification($order_id) {
       // Create a mailer
       $mailer = $woocommerce->mailer();
 
-      $message_body = __( 'Order is Ready to Pick Up' );
+      $message_body = __( 'Your order is ready to Pick Up. Thank you for your purchase!' );
 
       $message = $mailer->wrap_message(
         // Message head and message body.
-        sprintf( __( 'Order %s received' ), $order->get_order_number() ), $message_body );
+        sprintf( __( 'Order %s  Ready to Pick Up' ), $order->get_order_number() ), $message_body );
       // Cliente email, email subject and message.
-       $mailer->send( $order->billing_email, sprintf( __( 'Order %s received' ), $order->get_order_number() ), $message );
+       $mailer->send( $order->billing_email, sprintf( __( 'Order %s Ready to Pick Up' ), $order->get_order_number() ), $message );
     
 
    }
